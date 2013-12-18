@@ -24,7 +24,7 @@ BotsGl::BotsGl(int h, int w) {
 	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	setScreen(h,w);
+	setScreen(h,w,10,10);
 }
 
 BotsGl::~BotsGl() {

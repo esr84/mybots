@@ -8,6 +8,12 @@
 #ifndef BOTLOGIC_H_
 #define BOTLOGIC_H_
 
+#include<boost/asio.hpp>
+#include <boost/thread/thread.hpp>
+
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 #include "bots/bots.h"
 
 // borrar despues
@@ -28,6 +34,7 @@ private:
 	std::shared_ptr<tcp::socket> sock;
 
 	void send(tcp::socket &socket, const std::string & str);
+	void readData();
 	void logicThread();
 public:
 	BotLogic(char* port, char* server, std::shared_ptr<bots> bots);

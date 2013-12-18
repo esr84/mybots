@@ -8,7 +8,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "BotLogic.h"
-#include "botclient.h"
+#include "BotClient.h"
 
 using boost::asio::ip::tcp;
 
@@ -42,11 +42,23 @@ BotLogic::~BotLogic() {
 
 void BotLogic::send(tcp::socket &socket, const std::string & str) {
 	boost::asio::write(socket, boost::asio::buffer(str + "\n"), boost::asio::transfer_all());
+	//boost::asio::write(socket, boost::asio::buffer(str + "\n"), boost::asio::transfer_all());
+	/*boost::asio::async_write(socket, boost::asio::buffer(str + "\n"),boost::asio::transfer_all(),
+						     [this](boost::system::error_code ec, std::size_t length)
+						     {
+								std::cout << "entro";
+						     });*/
 }
+
+void BotLogic::readData(){
+
+}
+
+
 void BotLogic::logicThread(){
 
 	bool end;
-	bot_client ai(*_bots);
+	BotClient ai(*_bots);
 	boost::asio::streambuf buf;
 	{
 		boost::mutex::scoped_lock lock(state_mutex);
@@ -59,9 +71,15 @@ void BotLogic::logicThread(){
 		for(auto b : _bots->team_bots(id)){
 			std::stringstream stream;
 			stream << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
+			std::cout << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
 			send(*sock, stream.str());
 		}
-		read_until(*sock, buf,"\n");
+		//read_until(*sock, buf,"\n");
+		boost::asio::async_read(*sock, buf,
+				[this](boost::system::error_code ec, std::size_t length)
+			     {
+					std::cout << "entro" << length;
+			     });
 
 		std::string data;
 		std::istream is(&buf);
@@ -94,7 +112,7 @@ void BotLogic::logicThread(){
 
 			boost::archive::text_iarchive ia(state);
 			{
-				boost::mutex::scoped_lock lock(bots_mutex);
+				boost::mutex::scoped_lock(bots_mutex);
 				ia >> *_bots;
 			}
 		}
