@@ -17,25 +17,32 @@
 #include "bots/bots.h"
 
 // borrar despues
-#include "BotsGl.h"
+#include "BotClient.h"
+#include "BotHandler.h"
+#include "BotConnect.h"
 
 using boost::asio::ip::tcp;
 
-class BotLogic {
+class BotLogic : public BotHandler{
 private:
 	bool conected;
 	bool gameOver;
-	std::shared_ptr<bots> _bots;
+	std::shared_ptr<BotClient> ai;
 	bot::team_id id;
 	boost::thread hilo;
 	boost::mutex state_mutex;
 	bot::field_size field_h,field_w;
 
-	std::shared_ptr<tcp::socket> sock;
+	//std::shared_ptr<tcp::socket> sock;
+
+	BotConnect sock;
+	char _port[32];
+	char _server[256];
 
 	void send(tcp::socket &socket, const std::string & str);
 	void readData();
 	void logicThread();
+	void perform();
 public:
 	BotLogic(char* port, char* server, std::shared_ptr<bots> bots);
 	void iniThread();
@@ -49,6 +56,10 @@ public:
 	boost::mutex bots_mutex;
 
 	virtual ~BotLogic();
+
+	void isConnected();
+	void isSendData();
+	void isRecuveData(boost::asio::streambuf *buf);
 };
 
 #endif /* BOTLOGIC_H_ */

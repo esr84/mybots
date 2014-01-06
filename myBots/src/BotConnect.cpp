@@ -17,21 +17,25 @@
 
 //using boost::asio::ip::tcp;
 
-BotConnect::BotConnect(char* port, char* server, BotLogic *logic):_logic(logic) {
-
-	boost::asio::io_service io_services;
-	tcp::resolver resolver(io_services);
-	sock = std::make_shared<tcp::socket>(io_services);
-	tcp::resolver::query query(server, port);
-	resolver.async_resolve(query,
-	          boost::bind(&BotConnect::handle_resolve, this,
-	          boost::asio::placeholders::error,
-	          boost::asio::placeholders::iterator));
+BotConnect::BotConnect() {
 
 }
 
 BotConnect::~BotConnect() {
 	// TODO !CodeTemplates.destructorstub.tododesc!
+}
+
+void BotConnect::connect(char* port, char* server, boost::asio::io_service *io_service){
+	strcpy(_port,port);
+	strcpy(_server,server);
+	_io_service = io_service;
+	tcp::resolver resolver(*io_service);
+	sock = std::make_shared<tcp::socket>(*io_service);
+	tcp::resolver::query query(server, port);
+	resolver.async_resolve(query,
+		          boost::bind(&BotConnect::handle_resolve, this,
+		          boost::asio::placeholders::error,
+		          boost::asio::placeholders::iterator));
 }
 
 void BotConnect::handle_resolve(const boost::system::error_code& err,
@@ -48,7 +52,10 @@ void BotConnect::handle_resolve(const boost::system::error_code& err,
    }
    else
    {
-     std::cout << "Error: " << err.message() << "\n";
+	 if(err.value()==125)
+		 connect(_port, _server, _io_service);
+	 else
+		 std::cout << "Error: " << err.message() << "\n";
    }
  }
 
@@ -57,13 +64,39 @@ void BotConnect::handle_connect(const boost::system::error_code& err)
 {
   if (!err)
   {
-    // The connection was successful. Send the request.
-    boost::asio::async_write(socket_, request_,
-        boost::bind(&client::handle_write_request, this,
-          boost::asio::placeholders::error));
+	  _logic->isConnected();
   }
   else
   {
     std::cout << "Error: " << err.message() << "\n";
   }
+}
+
+void BotConnect::send(const std::string & str){
+	 // The connection was successful. Send the request.
+	      boost::asio::async_write(*sock, boost::asio::buffer(str + "\n"),
+	          boost::bind(&BotConnect::handle_write, this,
+	            boost::asio::placeholders::error));
+}
+void BotConnect::handle_write(const boost::system::error_code& err){
+	// se ignora //
+}
+
+void BotConnect::read()
+{
+	boost::asio::async_read_until(*sock, _response, "\n",
+	          boost::bind(&BotConnect::handle_read, this,
+	            boost::asio::placeholders::error));
+}
+
+void BotConnect::handle_read(const boost::system::error_code& err)
+{
+	if (!err)
+	  {
+		  _logic->isRecuveData(&_response);
+	  }
+	  else
+	  {
+	    std::cout << "Error: " << err.message() << "\n";
+	  }
 }

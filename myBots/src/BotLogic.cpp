@@ -7,15 +7,17 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include<string.h>
+
 #include "BotLogic.h"
 #include "BotClient.h"
 
 using boost::asio::ip::tcp;
 
-BotLogic::BotLogic(char* port, char* server,std::shared_ptr<bots> bots) {
+BotLogic::BotLogic(char* server, char* port,std::shared_ptr<bots> bots) {
 	// conexion con el server //
-	boost::asio::io_service io_services;
-	_bots = bots;
+/*	boost::asio::io_service io_services;
+
 
 	tcp::resolver resolver(io_services);
 //	try
@@ -29,10 +31,13 @@ BotLogic::BotLogic(char* port, char* server,std::shared_ptr<bots> bots) {
 	//}catch(std::exception &ex){
 		//std::cout << ex.what();
 	//}
-
+*/
+	ai= std::make_shared<BotClient>(bots);
+	strcpy(_port,port);
+	strcpy(_server,server);
+	sock.addHandler(this);
 	gameOver = false;
 	conected = false;
-
 }
 
 BotLogic::~BotLogic() {
@@ -57,8 +62,12 @@ void BotLogic::readData(){
 
 void BotLogic::logicThread(){
 
-	bool end;
-	BotClient ai(*_bots);
+	boost::asio::io_service io_service;
+	sock.connect(_port,_server,&io_service);
+	io_service.run();
+
+/*	bool end;
+
 	boost::asio::streambuf buf;
 	{
 		boost::mutex::scoped_lock lock(state_mutex);
@@ -121,7 +130,7 @@ void BotLogic::logicThread(){
 			end=gameOver;
 		}
 
-	}
+	}*/
 }
 
 void BotLogic::iniThread(){
@@ -153,3 +162,67 @@ bot::field_size BotLogic::getFieldW()
 	return field_w;
 }
 
+void BotLogic::perform(){
+	ai->perform(5);
+
+		for(auto b : ai->getBots()->team_bots(id)){
+			std::stringstream stream;
+			stream << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
+			std::cout << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
+			sock.send(stream.str());
+		}
+
+		sock.read();
+}
+
+void BotLogic::isConnected(){
+	perform();
+}
+void BotLogic::isSendData(){
+
+}
+void BotLogic::isRecuveData(boost::asio::streambuf *buf){
+	bool end;
+	std::string data;
+			std::istream is(buf);
+			std::getline(is,data);
+
+			std::istringstream stream(data);
+
+			std::string command;
+			stream >> command;
+
+			if(command == "welcome"){
+				stream >> id;
+				std::cout << "team id: " << id << std::endl;
+				ai->set_team(id);
+
+				stream >> field_w;
+				stream >> field_h;
+				{
+					boost::mutex::scoped_lock lock(state_mutex);
+					conected = true;
+				}
+			}else if(command == "state")
+			{
+				std::stringstream state;
+				while(!stream.eof()){
+					std::string a;
+					stream >> a;
+					state << a << " ";
+				}
+
+				boost::archive::text_iarchive ia(state);
+				{
+					boost::mutex::scoped_lock(bots_mutex);
+					ai->setBots(ia);
+				}
+			}
+			{
+				boost::mutex::scoped_lock lock(state_mutex);
+				end = gameOver;
+			}
+
+			if(!end)
+				perform();
+}
