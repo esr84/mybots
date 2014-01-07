@@ -10,6 +10,7 @@
 
 #include "bots/bots.h"
 #include "bots/bot.h"
+#include "MiniMaxState.h"
 
 class BotMiniMax {
 public:
@@ -22,6 +23,12 @@ public:
 
 private:
 	bot::team_id _team;
+
+	int calculateNumBots(const std::map<bot::team_id, size_t> & numBots);
+	int calculateMiniMax(bots & actBots,const bot::position & position);
+
+	MiniMaxState state;
+	int sizeField;
 };
 
 #endif /* BOTMINIMAX_H_ */

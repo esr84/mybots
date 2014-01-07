@@ -80,6 +80,9 @@ void BotConnect::send(const std::string & str){
 }
 void BotConnect::handle_write(const boost::system::error_code& err){
 	// se ignora //
+	if(err){
+		std::cout << "Error: " << err.message() << "\n";
+	}
 }
 
 void BotConnect::read()

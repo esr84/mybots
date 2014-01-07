@@ -163,7 +163,10 @@ bot::field_size BotLogic::getFieldW()
 }
 
 void BotLogic::perform(){
-	ai->perform(5);
+	{
+		boost::mutex::scoped_lock(bots_mutex);
+		ai->perform(2);
+	}
 
 		for(auto b : ai->getBots()->team_bots(id)){
 			std::stringstream stream;

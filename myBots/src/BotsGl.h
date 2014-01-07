@@ -21,7 +21,7 @@ public:
 	void setScreen(int w, int h, int fw = 0, int fh = 0);
 	int eventControler();
 	void clearScreen();
-	void paintBots(const bot & the_bot);
+	void paintBots(const bot::position & pos,unsigned int t );
 	void swapBuffers();
 };
 

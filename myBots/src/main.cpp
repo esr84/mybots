@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 		{
 			boost::mutex::scoped_lock(logic.bots_mutex);
 			_bots->for_each_bot([&_bots,&gl](const bot & the_bot) {
-				gl.paintBots(the_bot);
+				gl.paintBots(the_bot.get_position(),the_bot.get_team());
 			});
 		}
 		gl.swapBuffers();

@@ -68,12 +68,12 @@ void BotsGl::clearScreen(){
 	 glMatrixMode(GL_MODELVIEW);
 }
 
-void BotsGl::paintBots(const bot & the_bot){
-	auto t = the_bot.get_team() + 1;
-
+void BotsGl::paintBots(const bot::position & pos,unsigned int t ){
+	//auto t = the_bot.get_team() + 1;
+	t++;
 	glColor3f(t * 0.2, t * 0.3, t * 0.7);
 
-	const bot::position & pos = the_bot.get_position();
+	//onst bot::position & pos = the_bot.get_position();
 
 	// WARNING deprecated OpenGL!
 	glLoadIdentity();
