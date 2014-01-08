@@ -7,7 +7,7 @@
 
 #include "BotMiniMax.h"
 
-BotMiniMax::BotMiniMax() {
+BotMiniMax::BotMiniMax(bot::team_id team): _team(team) {
 	// TODO Apéndice de constructor generado automáticamente
 
 }
@@ -23,11 +23,17 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 	  bot::direction prov;
 	  int  numBot;
 	  sizeField = actBots.get_size().first * actBots.get_size().first;
-	  bot::position newPosition;
+	  bot::position newPosition=position;
+	  bots newBots = bots(actBots);
+	  prov = initialStep(newBots,newPosition);
+
+	  if(prov != bot::direction::NOTHING)
+		  return prov;
+
 	  for(int i = 0; i < 9; i++) {
 
 		  bot::direction new_dir = static_cast<bot::direction>(i);
-		  bots newBots = bots(actBots);
+		  newBots = bots(actBots);
 		  bot *botAux = &newBots[position];
 		  // copiamos el numero de bots que hay en el momento actual en el campo //
 		 numBot = calculateNumBots(newBots.bot_count());
@@ -47,8 +53,74 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 			prov = new_dir;
 		  }
 	  }
-
+	  std::cout << "max " << max;
 	  return prov;
+}
+
+bot::direction BotMiniMax::initialStep(bots & actBots, const bot::position & position)
+{
+	bot  *nearBot = nullptr;
+	bool equals = true;
+	int distMin = sizeField;
+	actBots.for_each_bot([this,actBots,position,&equals,&distMin,&nearBot](bot & theBot) {
+		bot myBot = actBots[position];
+		int aux;
+
+		if(theBot.get_team() == _team)
+			return;
+		 aux = actBots.distance_x(theBot,myBot) + actBots.distance_y(theBot,myBot);
+		 if(state.comparateBot(myBot,theBot) != state.comparateBot(theBot,myBot)){
+			 equals=false;
+			 return;
+		 }
+		 if(aux < distMin){
+			 distMin = aux;
+			 nearBot = &theBot;
+		 }
+
+	});
+
+	if(!equals || nearBot == nullptr)
+		return bot::direction::NOTHING;
+
+	return calculateDirection(actBots[position],*nearBot);
+}
+
+bot::direction BotMiniMax::calculateDirection(const bot & BotSource, const bot & BotDesti)
+{
+	bot::direction new_dir;
+	int x,y;
+	x = BotSource.get_x() - BotDesti.get_x();
+	y = BotSource.get_y() - BotDesti.get_y();
+
+	if(y == 0){
+		if(x<0)
+			return bot::direction::E;
+		else
+			return bot::direction::W;
+	}
+	if(x==0){
+		if(y<0)
+			return bot::direction::N;
+		else
+			return bot::direction::S;
+	}
+
+	if(x<0)
+	{
+		if(y<0)
+			return bot::direction::NE;
+		else
+			return bot::direction::SE;
+	}
+
+	if(x>0)
+	{
+		if(y<0)
+			return bot::direction::NW;
+		else
+			return bot::direction::SW;
+	}
 }
 
 int BotMiniMax::functionMax(bots & actBots,const bot::position & position,int depth){
@@ -100,11 +172,11 @@ int BotMiniMax::functionMin(bots & actBots,const bot::position & position,int de
 			 bots newBots = bots(actBots);
 			 newBots[my_bot.get_position()].try_to_do(new_dir);
 			 newBots.step();
-			 if(newBots.find_at(position)== nullptr)
+			 /*if(newBots.find_at(position)== nullptr)
 			 {
 				 min=sizeField*(-1);
 				 return;
-			 }
+			 }*/
 			 actualMin = min;
 			 aux= this->functionMax(newBots,position,depth);
 			 min = actualMin;
@@ -150,10 +222,20 @@ int BotMiniMax::calculateMiniMax(bots & actBots,const bot::position & position)
 
 			 if(state.getLow().damage > damage && bloked > 0){
 				 state.setLow(theBot.get_position(),aux,bloked,damage);
+				 return;
 			 }
 
-			 if(state.getup().blokedDam > bloked){
+			 if(state.getup().blokedDam > bloked ){
 				 state.setUp(theBot.get_position(),aux,bloked,damage);
+				 return;
+			 }
+
+			 if(&state.getup() == &state.getLow())
+			 {
+				 if(bloked > 0)
+					 state.setLow(theBot.get_position(),aux,bloked,damage);
+				 else
+					 state.setUp(theBot.get_position(),aux,bloked,damage);
 			 }
 	});
 

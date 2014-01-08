@@ -17,6 +17,7 @@
 #include "bots/bots.h"
 
 // borrar despues
+#include "BotsGl.h"
 #include "BotClient.h"
 #include "BotHandler.h"
 #include "BotConnect.h"
@@ -34,6 +35,7 @@ private:
 	bot::field_size field_h,field_w;
 
 	//std::shared_ptr<tcp::socket> sock;
+	BotsGl gl;
 
 	BotConnect sock;
 	char _port[32];
@@ -43,8 +45,9 @@ private:
 	void readData();
 	void logicThread();
 	void perform();
+	void paint();
 public:
-	BotLogic(char* port, char* server, std::shared_ptr<bots> bots);
+	BotLogic(char* port, char* server, std::shared_ptr<bots> bots,int winWidth,int winHeight);
 	void iniThread();
 	bool getConnected();
 	bool getGamever();

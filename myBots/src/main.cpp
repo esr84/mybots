@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	int winWidth = 500;
 	int winHeight = 500;
 
-	BotsGl gl(winWidth, winHeight);
+	//BotsGl gl(winWidth, winHeight);
 
 	// comprobacion de que los parametros sean los minimos //
 	if (argc < 3) {
@@ -30,13 +30,13 @@ int main(int argc, char* argv[]) {
 
 	std::shared_ptr<bots> _bots = std::make_shared<bots>();
 
-	BotLogic logic(argv[1], argv[2], _bots);
+	BotLogic logic(argv[1], argv[2], _bots,winWidth,winHeight);
 	logic.iniThread();
 
 /*	while (!logic.getGamever()) {
 
 	}*/
-	while (!logic.getGamever()) {
+	/*while (!logic.getGamever()) {
 		if (gl.eventControler() == SDLK_ESCAPE)
 			logic.finishGame();
 
@@ -49,6 +49,6 @@ int main(int argc, char* argv[]) {
 			});
 		}
 		gl.swapBuffers();
-	}
+	}*/
 
 }

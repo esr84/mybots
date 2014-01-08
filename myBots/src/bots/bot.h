@@ -27,7 +27,7 @@ class bot
 
         // this should be read from a config file... any volunteers?
         // what about a quake-like console? there are some libraries for that!
-        static const int MAX_ENERGY = 1;
+        static const int MAX_ENERGY = 10;
         static const int BASE_ATTACK = 2;
         static const int BASE_DEFENSE = 1;
         static const int KILLS_FOR_ENERGY = 3;
@@ -36,9 +36,9 @@ class bot
 
         typedef unsigned short status;
 
-        typedef unsigned int team_id;
+        typedef unsigned int team_id ;
 
-        typedef unsigned int field_size;
+        typedef unsigned int field_size ;
 
         enum direction { NOTHING, N, NE, E, SE, S, SW, W, NW };
 

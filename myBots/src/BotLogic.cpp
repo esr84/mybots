@@ -8,13 +8,14 @@
 #include <boost/thread/mutex.hpp>
 
 #include<string.h>
+#include<SDL/SDL.h>
 
 #include "BotLogic.h"
 #include "BotClient.h"
 
 using boost::asio::ip::tcp;
 
-BotLogic::BotLogic(char* server, char* port,std::shared_ptr<bots> bots) {
+BotLogic::BotLogic(char* server, char* port,std::shared_ptr<bots> bots,int winWidth,int winHeight): gl(winWidth, winHeight) {
 	// conexion con el server //
 /*	boost::asio::io_service io_services;
 
@@ -133,8 +134,25 @@ void BotLogic::logicThread(){
 	}*/
 }
 
+void BotLogic::paint(){
+	if (gl.eventControler() == SDLK_ESCAPE)
+		finishGame();
+
+	gl.clearScreen();
+
+	ai->getBots()->for_each_bot([this](const bot & the_bot) {
+		gl.paintBots(the_bot.get_position(),the_bot.get_team());
+	});
+	gl.swapBuffers();
+
+}
+
 void BotLogic::iniThread(){
-	 boost::thread t = boost::thread(    [this]() { logicThread(); } );
+	 //boost::thread t = boost::thread(    [this]() { logicThread(); } );
+	paint();
+	boost::asio::io_service io_service;
+	sock.connect(_port,_server,&io_service);
+	io_service.run();
 }
 
 bool BotLogic::getConnected(){
@@ -170,12 +188,14 @@ void BotLogic::perform(){
 
 		for(auto b : ai->getBots()->team_bots(id)){
 			std::stringstream stream;
-			stream << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
-			std::cout << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction();
+			stream << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction() ;
+			std::cout << "move " << b->get_x() << " " << b->get_y() << " " << b->get_next_direction()<< "\n";
 			sock.send(stream.str());
 		}
 
 		sock.read();
+
+		paint();
 }
 
 void BotLogic::isConnected(){
@@ -220,6 +240,9 @@ void BotLogic::isRecuveData(boost::asio::streambuf *buf){
 					boost::mutex::scoped_lock(bots_mutex);
 					ai->setBots(ia);
 				}
+				ai->getBots()->for_each_bot([this](bot & my_bot) {
+					std::cout << "\n" << my_bot.get_team() << " exp: " << my_bot.get_experience() << " kill: " << my_bot.get_kills() << " ener: " << my_bot.get_energy() <<"\n";
+				});
 			}
 			{
 				boost::mutex::scoped_lock lock(state_mutex);

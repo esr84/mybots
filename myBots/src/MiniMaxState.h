@@ -21,6 +21,7 @@ public:
 		lowBot.distancia = dist;
 		lowBot.blokedDam = bloked;
 		lowBot.damage = damage;
+		isSetInit = true;
 	}
 
 	inline void setUp(bot::position position,bot::field_size dist,int damage, int bloked){
@@ -29,6 +30,7 @@ public:
 		upBot.distancia = dist;
 		upBot.blokedDam = bloked;
 		upBot.damage = damage;
+		isSetInit = true;
 	}
 
 	inline const BotResume & getLow()

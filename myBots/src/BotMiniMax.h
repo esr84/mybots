@@ -14,9 +14,10 @@
 
 class BotMiniMax {
 public:
-	BotMiniMax();
+	BotMiniMax(bot::team_id team);
 	virtual ~BotMiniMax();
 
+	bot::direction initialStep(bots & actBots, const bot::position & position);
 	bot::direction initIa(const bots & actBots, const bot::position & position,int depth);
 	int functionMax(bots & actBots,const bot::position & position,int depth);
 	int functionMin(bots & actBots,const bot::position & position,int depth);
@@ -26,6 +27,7 @@ private:
 
 	int calculateNumBots(const std::map<bot::team_id, size_t> & numBots);
 	int calculateMiniMax(bots & actBots,const bot::position & position);
+	bot::direction calculateDirection(const bot & BotSource, const bot & BotDesti);
 
 	MiniMaxState state;
 	int sizeField;
