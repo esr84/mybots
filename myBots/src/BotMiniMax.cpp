@@ -30,6 +30,11 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 	  if(prov != bot::direction::NOTHING)
 		  return prov;
 
+	  newPosition=position;
+	  adjacentBot(newPosition, actBots);
+	  if(prov != bot::direction::NOTHING)
+	 		  return prov;
+
 	  for(int i = 0; i < 9; i++) {
 
 		  bot::direction new_dir = static_cast<bot::direction>(i);
@@ -46,15 +51,46 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 			  return new_dir;
 
 		  newPosition = botAux->get_position();
+		  botAux->try_to_do(bot::direction::NOTHING);
 		  aux = functionMin(newBots,newPosition,depth);
 		  if(aux > max)
 		  {
 			max = aux;
 			prov = new_dir;
 		  }
+		  std::cout << new_dir << " " << aux << " -- ";;
 	  }
-	  std::cout << "max " << max;
+
+	  std::cout << "\n";
 	  return prov;
+}
+
+bot::direction BotMiniMax::adjacentBot(bot::position & position, const bots & actBots)
+{
+	std::vector<bot *> adj;
+	int min = 10000;
+
+
+	bot  *nearBot = nullptr;
+	bots newBots;
+	bot *botAux;
+
+	for(int i = 0; i < 3; i++)
+	{
+		bot::position & newPosition = position;
+		for(int j = 0; j < 3; j++){
+			actBots.find_at(position);
+			/*if(it->get_energy()<min){
+				min = it->get_energy();
+				nearBot = it;
+			}*/
+		}
+	}
+
+	if( nearBot == nullptr)
+			return bot::direction::NOTHING;
+
+	return calculateDirection(actBots[position],*nearBot);
 }
 
 bot::direction BotMiniMax::initialStep(bots & actBots, const bot::position & position)
@@ -152,12 +188,14 @@ int BotMiniMax::functionMax(bots & actBots,const bot::position & position,int de
 				  return sizeField;
 			  // pedimos la nueva posicion de nuestro bot //
 			  newPosition = botAux->get_position();
+			  botAux->try_to_do(bot::direction::NOTHING);
 			  // llamamos a la funcion min con este movimiento //
 			  aux =functionMin(newBots,newPosition,depth);
 			  // si el maximo actual es menor que el maximo devuelto por la funcion lo actualizamos //
 			  if(max<aux)
 				  max = aux;
 		  }
+		  return max;
 }
 
 int BotMiniMax::functionMin(bots & actBots,const bot::position & position,int depth){
@@ -199,45 +237,70 @@ int BotMiniMax::calculateNumBots(const std::map<bot::team_id, size_t> & numBots)
 	return num;
 }
 
-int BotMiniMax::calculateMiniMax(bots & actBots,const bot::position & position)
+
+
+ int BotMiniMax::calculateMiniMax(bots & actBots,const bot::position & position)
 {
+	int distM ;
+	int aux;
+	int c;
+	for(c=0;c<2;c++){
 	state.reset();
-	actBots.for_each_bot([this,actBots,position](bot & theBot) {
+	int dismComp=-100;
+	actBots.for_each_bot([this,actBots,position,&dismComp](bot & theBot) {
 			unsigned int aux;
-			int damage,bloked;
+
+			int tiene,tengo;
 			bot myBot = actBots[position];
-			 if(theBot.get_team() == _team)
+			 if(theBot.get_team() == _team){
+
+				 aux = actBots.distance_x(theBot,myBot) + actBots.distance_y(theBot,myBot);
+				 if(aux == 0)
+					 return;
+				 if(dismComp>aux && aux != 0)
+					 dismComp = aux;
 				 return;
+			 }
 
 			 aux = actBots.distance_x(theBot,myBot) + actBots.distance_y(theBot,myBot);
-			 bloked = state.comparateBot(myBot,theBot);
-			 damage = state.comparateBot(theBot,myBot);
+			 tengo = state.comparateBot(myBot,theBot);
+			 tiene = state.comparateBot(theBot,myBot);
 
 			 if(!state.getIsSetInit())
 			 {
-				 state.setLow(theBot.get_position(),aux,bloked,damage);
-				 state.setUp(theBot.get_position(),aux,bloked,damage);
+				 state.setLow(theBot.get_position(),aux,tengo,tiene);
+				 state.setUp(theBot.get_position(),aux,tengo,tiene);
 				 return;
 			 }
 
-			 if(state.getLow().damage > damage && bloked > 0){
-				 state.setLow(theBot.get_position(),aux,bloked,damage);
+			 if(state.getLow().damage > tiene && tengo > 0){
+				 state.setLow(theBot.get_position(),aux,tengo,tiene);
 				 return;
 			 }
 
-			 if(state.getup().blokedDam > bloked ){
-				 state.setUp(theBot.get_position(),aux,bloked,damage);
+			 if(state.getup().damage < tiene && tengo > 0){
+				 state.setUp(theBot.get_position(),aux,tengo,tiene);
 				 return;
 			 }
 
-			 if(&state.getup() == &state.getLow())
+			 if(state.comparate())
 			 {
-				 if(bloked > 0)
-					 state.setLow(theBot.get_position(),aux,bloked,damage);
+				 if(tengo > 0)
+					 state.setLow(theBot.get_position(),aux,tengo,tiene);
 				 else
-					 state.setUp(theBot.get_position(),aux,bloked,damage);
+					 state.setUp(theBot.get_position(),aux,tengo,tiene);
 			 }
 	});
 
-	return state.getLow().distancia - state.getup().distancia;
+
+
+	aux =  dismComp;
+	int energyM =(state.getLow().blokedDam+state.getup().damage) - (state.getLow().damage+state.getup().blokedDam);
+	distM = 1000 - (state.getLow().distancia*(state.getLow().blokedDam+state.getup().damage)) - (state.getup().distancia*(state.getLow().damage+state.getup().blokedDam));
+
+	if(distM + aux == 0)
+			std::cout << "";
+	}
+	return  distM + aux;
 }
+

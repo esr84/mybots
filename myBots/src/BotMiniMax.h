@@ -18,6 +18,7 @@ public:
 	virtual ~BotMiniMax();
 
 	bot::direction initialStep(bots & actBots, const bot::position & position);
+	bot::direction adjacentBot(bot::position & position, const bots & actBots);
 	bot::direction initIa(const bots & actBots, const bot::position & position,int depth);
 	int functionMax(bots & actBots,const bot::position & position,int depth);
 	int functionMin(bots & actBots,const bot::position & position,int depth);

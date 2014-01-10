@@ -43,6 +43,10 @@ public:
 			return upBot;
 	}
 
+	inline bool comparate()
+	{
+		return upBot == lowBot;
+	}
 
 	bool getIsSetInit(){
 		return isSetInit;

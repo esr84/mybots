@@ -28,6 +28,11 @@ public:
 		blokedDam = 0;
 	}
 
+	bool operator==(const BotResume & res1)
+	{
+		return res1.posicion.first ==this->posicion.first && res1.posicion.second ==this->posicion.second;
+	}
+
 };
 
 #endif /* BOTRESUME_H_ */
