@@ -8,6 +8,8 @@
 #ifndef BOTHANDLER_H_
 #define BOTHANDLER_H_
 
+#include<boost/asio.hpp>
+
 class BotHandler {
 public:
 	virtual void isConnected()=0;

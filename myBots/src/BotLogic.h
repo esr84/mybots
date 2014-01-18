@@ -20,7 +20,7 @@
 #include "BotsGl.h"
 #include "BotClient.h"
 #include "BotHandler.h"
-#include "BotConnect.h"
+#include "FacadeNetwork.h"
 
 using boost::asio::ip::tcp;
 
@@ -28,7 +28,7 @@ class BotLogic : public BotHandler{
 private:
 	bool conected;
 	bool gameOver;
-	std::shared_ptr<BotClient> ai;
+	std::shared_ptr<BotClient<bots>> ai;
 	bot::team_id id;
 	boost::thread hilo;
 	boost::mutex state_mutex;
@@ -36,8 +36,8 @@ private:
 
 	//std::shared_ptr<tcp::socket> sock;
 	BotsGl gl;
+	FacadeNetwork facade;
 
-	BotConnect sock;
 	char _port[32];
 	char _server[256];
 
@@ -62,6 +62,7 @@ public:
 
 	void isConnected();
 	void isSendData();
+	void isRecuveData();
 	void isRecuveData(boost::asio::streambuf *buf);
 };
 

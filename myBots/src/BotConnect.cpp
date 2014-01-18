@@ -64,7 +64,8 @@ void BotConnect::handle_connect(const boost::system::error_code& err)
 {
   if (!err)
   {
-	  _logic->isConnected();
+	  for(auto aux : _logic)
+		  aux->isConnected();
   }
   else
   {
@@ -96,7 +97,8 @@ void BotConnect::handle_read(const boost::system::error_code& err)
 {
 	if (!err)
 	  {
-		  _logic->isRecuveData(&_response);
+		for(auto aux : _logic)
+			aux->isRecuveData(&_response);
 	  }
 	  else
 	  {

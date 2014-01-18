@@ -17,7 +17,7 @@ public:
 	virtual ~BotConnect();
 
 	void addHandler(BotHandler *logic){
-		_logic = logic;
+		_logic.push_back(logic);
 	}
 
 	void connect(char* port, char* server, boost::asio::io_service *io_services);
@@ -31,7 +31,7 @@ private:
 	void handle_write(const boost::system::error_code& err);
 	void handle_read(const boost::system::error_code& err);
 	std::shared_ptr<tcp::socket> sock;
-	BotHandler *_logic;
+	std::vector<BotHandler *> _logic;
 	boost::asio::streambuf _response;
 	char _port[32];
 	char _server[256];

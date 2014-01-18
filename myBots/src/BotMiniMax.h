@@ -26,6 +26,7 @@ public:
 private:
 	bot::team_id _team;
 
+	bool validPosition(bot *newBot,const bot::position & position,bots & actBots,bot::direction direction);
 	int calculateNumBots(const std::map<bot::team_id, size_t> & numBots);
 	int calculateMiniMax(bots & actBots,const bot::position & position);
 	bot::direction calculateDirection(const bot & BotSource, const bot & BotDesti);
