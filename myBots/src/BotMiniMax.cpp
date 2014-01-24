@@ -43,7 +43,7 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 	  if(prov != bot::direction::NOTHING)
 	 		  return prov;
 
-	  std::cout<<"position" << position.first << ":" << position.second << " ";
+
 	  for(int i = 8; i >= 0; i--) {
 
 		  bot::direction new_dir = static_cast<bot::direction>(i);
@@ -53,7 +53,7 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 		 numBot = calculateNumBots(newBots.bot_count());
 		 // realizamos el movimiento //
 		 if(!validPosition(botAux,position,newBots,new_dir)){
-			 std::cout << new_dir << " lim -- ";
+
 			 continue;
 		 }
 		 newBots.step();
@@ -70,10 +70,10 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 			max = aux;
 			prov = new_dir;
 		  }
-		  std::cout << new_dir << " " << aux << " -- ";
+
 	  }
 
-	  std::cout << "\n";
+
 	  return prov;
 }
 

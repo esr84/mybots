@@ -83,7 +83,7 @@ void FacadeNetwork::sendVector(){
 		if(_newSend){
 			for(const std::string aux : _bufferSend){
 				_sock.send(aux);
-				std::cout << "Valor de aux " << aux << "\n";
+			//	std::cout << "Valor de aux " << aux << "\n";
 			}
 
 			_bufferSend.clear();

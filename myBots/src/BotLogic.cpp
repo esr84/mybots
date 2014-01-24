@@ -59,7 +59,7 @@ bot::field_size BotLogic::getFieldW() {
 
 void BotLogic::perform() {
 
-	(ai)->perform(2);
+	(ai)->perform(1);
 
 	for (auto b : ai->getBots()->team_bots(id)) {
 		std::stringstream stream;
@@ -94,7 +94,7 @@ void BotLogic::isRecuveData() {
 
 	if (command == "welcome") {
 		stream >> id;
-		std::cout << "team id: " << id << std::endl;
+		//std::cout << "team id: " << id << std::endl;
 		ai->set_team(id);
 
 		stream >> field_w;
