@@ -12,6 +12,7 @@
 
 class BotHandler {
 public:
+	virtual void isCloseConnect()=0;
 	virtual void isConnected()=0;
 	virtual void isSendData()=0;
 	virtual void isRecuveData(boost::asio::streambuf *buf)=0;

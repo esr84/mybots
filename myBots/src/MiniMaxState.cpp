@@ -5,6 +5,7 @@
  *      Author: jgi
  */
 
+
 #include "MiniMaxState.h"
 
 MiniMaxState::MiniMaxState() {

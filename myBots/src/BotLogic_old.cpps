@@ -17,15 +17,14 @@ using boost::asio::ip::tcp;
 BotLogic::BotLogic(char* server, char* port, std::shared_ptr<bots> actBots,
 		int winWidth, int winHeight) :
 		gl(winWidth, winHeight) {
+
 	ai = std::make_shared<BotClient<bots>>(actBots);
 	strcpy(_port, port);
 	strcpy(_server, server);
 
+	gameOver = false;
 }
 
-BotLogic::~BotLogic() {
-	// TODO !CodeTemplates.destructorstub.tododesc!
-}
 
 void BotLogic::paint() {
 	if (gl.eventControler() == SDLK_ESCAPE)
@@ -49,15 +48,8 @@ void BotLogic::iniThread() {
 	}
 }
 
-bot::field_size BotLogic::getFieldH() {
-	return field_h;
-}
-
-bot::field_size BotLogic::getFieldW() {
-	return field_w;
-}
-
 void BotLogic::perform() {
+	paint();
 
 	(ai)->perform(2);
 
@@ -65,22 +57,12 @@ void BotLogic::perform() {
 		std::stringstream stream;
 		stream << "move " << b->get_x() << " " << b->get_y() << " "
 				<< b->get_next_direction();
-		//std::cout << "move " << b->get_x() << " " << b->get_y() << " "
-			//	<< b->get_next_direction() << "\n";
+		std::cout << "move " << b->get_x() << " " << b->get_y() << " "
+				<< b->get_next_direction() << "\n";
 		facade.send(stream.str());
 	}
-
-	paint();
 }
 
-void BotLogic::isConnected() {
-	perform();
-}
-void BotLogic::isSendData() {
-
-}
-void BotLogic::isRecuveData(boost::asio::streambuf *buf) {
-}
 void BotLogic::isRecuveData() {
 	bool end;
 	std::string data;
@@ -99,7 +81,6 @@ void BotLogic::isRecuveData() {
 
 		stream >> field_w;
 		stream >> field_h;
-
 	} else if (command == "state") {
 		std::stringstream state;
 		while (!stream.eof()) {
@@ -113,9 +94,5 @@ void BotLogic::isRecuveData() {
 			boost::mutex::scoped_lock(bots_mutex);
 			ai->setBots(ia);
 		}
-		ai->getBots()->for_each_bot(
-				[this](bot & my_bot) {
-				//	std::cout << "\n" << my_bot.get_team() << " exp: " << my_bot.get_experience() << " kill: " << my_bot.get_kills() << " ener: " << my_bot.get_energy() <<"\n";
-				});
 	}
 }

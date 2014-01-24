@@ -17,6 +17,7 @@ class FacadeNetwork: BotHandler {
 private:
 	BotConnect _sock;
 	BotHandler *_handler;
+	bool desconected;
 
 	std::vector<std::string> _bufferSend;
 	std::string _bufferRecuve;
@@ -36,10 +37,12 @@ public:
 	void connect(char* port, char* server);
 	void send(const std::string & str);
 	bool readBuffer(std::string&  buffer);
+	bool isDisconnected();
 
 	void isConnected();
 	void isSendData();
 	void isRecuveData(boost::asio::streambuf *buf);
+	void isCloseConnect();
 };
 
 #endif /* FACADENETWORK_H_ */

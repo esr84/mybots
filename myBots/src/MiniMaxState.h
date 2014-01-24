@@ -8,6 +8,7 @@
 #ifndef MINIMAXSTATE_H_
 #define MINIMAXSTATE_H_
 
+
 #include "bots/bot.h"
 #include "BotResume.h"
 

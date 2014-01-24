@@ -26,11 +26,13 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 	  bot::position newPosition=position;
 	  bots newBots = bots(actBots);
 
-	  prov = adjacentBot(newPosition,actBots);
+/*	  prov = adjacentBot(newPosition,actBots);
 
-	  if(prov != bot::direction::NOTHING)
+	  if(prov != bot::direction::NOTHING){
+		  std::cout <<"Adjacente\n";
 	 		  return prov;
-
+	  }
+*/
 	  prov = initialStep(newBots,newPosition);
 
 	  if(prov != bot::direction::NOTHING)
@@ -41,7 +43,8 @@ bot::direction BotMiniMax::initIa(const bots & actBots,const bot::position & pos
 	  if(prov != bot::direction::NOTHING)
 	 		  return prov;
 
-	  for(int i = 8; i >= 1; i--) {
+	  std::cout<<"position" << position.first << ":" << position.second << " ";
+	  for(int i = 8; i >= 0; i--) {
 
 		  bot::direction new_dir = static_cast<bot::direction>(i);
 		  newBots = bots(actBots);
@@ -104,9 +107,7 @@ bot::direction BotMiniMax::adjacentBot(bot::position & position, const bots & ac
 		bot::direction new_dir = static_cast<bot::direction>(i);
 		bots newBots = bots(actBots);
 		newBot = &newBots[position];
-
-		newBot->try_to_do(new_dir);
-		const bot *botAux = actBots.find_at(newBot->get_position());
+		const bot *botAux = actBots.find_at(bot::new_position(newBot->get_position(),new_dir));
 
 		if(botAux != nullptr && botAux->get_team() != _team
 				&& botAux->get_energy() < minEnergy){

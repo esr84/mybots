@@ -26,32 +26,26 @@ using boost::asio::ip::tcp;
 
 class BotLogic{
 private:
-
+	bool gameOver;
 	std::shared_ptr<BotClient<bots>> ai;
 	bot::team_id id;
 	bot::field_size field_h,field_w;
 
+	char _port[50];
+	char _server[128];
+	//std::shared_ptr<tcp::socket> sock;
 	BotsGl gl;
 	FacadeNetwork facade;
-
-	char _port[32];
-	char _server[256];
 	void perform();
 	void paint();
 public:
 	BotLogic(char* port, char* server, std::shared_ptr<bots> bots,int winWidth,int winHeight);
+	virtual ~BotLogic(){}
+
 	void iniThread();
-	bot::field_size getFieldH();
-	bot::field_size getFieldW();
 
-	boost::mutex bots_mutex;
-
-	virtual ~BotLogic();
-
-	void isConnected();
 	void isSendData();
 	void isRecuveData();
-	void isRecuveData(boost::asio::streambuf *buf);
 };
 
 #endif /* BOTLOGIC_H_ */

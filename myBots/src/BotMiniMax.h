@@ -17,6 +17,9 @@ public:
 	BotMiniMax(bot::team_id team);
 	virtual ~BotMiniMax();
 
+	inline void setSizeField(int s){
+		sizeField = s;
+	}
 	bot::direction initialStep(bots & actBots, const bot::position & position);
 	bot::direction adjacentBot(bot::position & position, const bots & actBots);
 	bot::direction initIa(const bots & actBots, const bot::position & position,int depth);

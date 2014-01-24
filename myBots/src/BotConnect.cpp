@@ -54,8 +54,11 @@ void BotConnect::handle_resolve(const boost::system::error_code& err,
    {
 	 if(err.value()==125)
 		 connect(_port, _server, _io_service);
-	 else
+	 else{
 		 std::cout << "Error: " << err.message() << "\n";
+		 for(auto aux : _logic)
+			 aux->isCloseConnect();
+	 }
    }
  }
 
@@ -70,6 +73,8 @@ void BotConnect::handle_connect(const boost::system::error_code& err)
   else
   {
     std::cout << "Error: " << err.message() << "\n";
+    for(auto aux : _logic)
+    	aux->isCloseConnect();
   }
 }
 
@@ -83,6 +88,8 @@ void BotConnect::handle_write(const boost::system::error_code& err){
 	// se ignora //
 	if(err){
 		std::cout << "Error: " << err.message() << "\n";
+		for(auto aux : _logic)
+			aux->isCloseConnect();
 	}
 }
 
@@ -103,5 +110,7 @@ void BotConnect::handle_read(const boost::system::error_code& err)
 	  else
 	  {
 	    std::cout << "Error: " << err.message() << "\n";
+	    for(auto aux : _logic)
+	    			aux->isCloseConnect();
 	  }
 }

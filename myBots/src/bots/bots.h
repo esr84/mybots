@@ -1,6 +1,10 @@
 #ifndef _BOTS_H_INCLUDED_
 #define _BOTS_H_INCLUDED_
 
+#if !defined( WIN32 )
+    #define BOOST_TEST_DYN_LINK
+#endif
+
 #include <map>
 #include <iostream>
 #include <random>

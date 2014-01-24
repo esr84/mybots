@@ -9,6 +9,7 @@
 
 FacadeNetwork::FacadeNetwork() {
 	_sock.addHandler(this);
+	desconected = false;
 
 }
 
@@ -20,6 +21,7 @@ void FacadeNetwork::initConnection(char* port, char* server){
 	boost::asio::io_service io_services;
 	_sock.connect(port,server,&io_services);
 	io_services.run();
+
 }
 
 void FacadeNetwork::connect(char* port, char* server)
@@ -61,18 +63,17 @@ void FacadeNetwork::isSendData(){
 
 }
 void FacadeNetwork::isRecuveData(boost::asio::streambuf *buf){
-	std::string data;
 	std::istream is(buf);
-
+	bool aux;
 	{
 		boost::mutex::scoped_lock lockRecuve(_recuveMutex);
 		std::getline(is,_bufferRecuve);
 		_newRecuve = true;
+		aux = desconected;
 	}
-
 	sendVector();
-
-	_sock.read();
+	if(!desconected)
+		_sock.read();
 }
 
 void FacadeNetwork::sendVector(){
@@ -80,10 +81,32 @@ void FacadeNetwork::sendVector(){
 	{
 		boost::mutex::scoped_lock lock(_sendMutex);
 		if(_newSend){
-			for(const std::string aux : _bufferSend)
+			for(const std::string aux : _bufferSend){
 				_sock.send(aux);
+				std::cout << "Valor de aux " << aux << "\n";
+			}
+
 			_bufferSend.clear();
 			_newSend = false;
 		}
 	}
 }
+
+void FacadeNetwork::isCloseConnect()
+{
+	{
+	boost::mutex::scoped_lock lockRecuve(_recuveMutex);
+	desconected=true;
+	}
+}
+
+bool FacadeNetwork::isDisconnected()
+{
+	bool aux;
+	{
+		boost::mutex::scoped_lock lockRecuve(_recuveMutex);
+		aux = desconected;
+	}
+	return aux;
+}
+
